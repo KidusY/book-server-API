@@ -38,6 +38,7 @@ bookmarkRouter
 			res.json(bookmark);
 		}
 		else {
+			res.status(404).send('Not found');
 			logger.error(`Sorry can't find ${id}`);
 			throw new Error(`Sorry can't find ${id}`);
 		}
