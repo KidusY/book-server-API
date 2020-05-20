@@ -24,7 +24,7 @@ bookmarkRouter
 		bookmark.description = description;
 		bookmark.rating = rating;
 		store.bookmarks.push(bookmark);
-		res.json(store.bookmarks);
+		res.json(bookmark);
 	});
 
 bookmarkRouter
