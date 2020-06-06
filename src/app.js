@@ -6,17 +6,18 @@ const helmet = require('helmet');
 const { NODE_ENV } = require('./config');
 const logger = require('./logger');
 const bookmarkRouter = require('./router/BookmarkRouter');
+const services = require('./services/services');
 
 const app = express();
 
-const morganSetting =
-
-		NODE_ENV === 'production' ? 'tiny' :
-		'common';
+const morganSetting = NODE_ENV === 'production' ? 'tiny' :	'common';
+console.log(NODE_ENV);
 app.use(morgan(morganSetting)); //combined vs common vs dev vs short vs tiny
 app.use(cors());
 app.use(helmet());
-
+app.get('/', (req, res) => {
+	res.send('Hello, boilerplate');
+});
 app.use(function validateBearerToken (req, res, next){
 	const apiToken = process.env.API_TOKEN;
 	const authToken = req.get('Authorization');
@@ -29,9 +30,7 @@ app.use(function validateBearerToken (req, res, next){
 	next();
 });
 app.use('/bookmarks', bookmarkRouter);
-app.get('/', (req, res) => {
-	res.send('Hello, boilerplate');
-});
+
 
 //error handler middleware
 app.use((error, req, res, next) => {

@@ -1,47 +1,44 @@
 const express = require('express');
 const bookmarkRouter = express.Router();
 const store = require('../store');
-const { v4: uuid } = require('uuid');
+
 const logger = require('../logger');
 const bodyParser = express.json();
+const knex = require('knex');
+const services = require('../services/services');
+
+
 bookmarkRouter
 	.route('/')
-	.get((req, res) => {
-		res.json(store.bookmarks);
+	.get((req, res,next) => {
+	//gets the db property from the server.js
+	const knexInstance = req.app.get('db');
+	services
+		.getAllBookMarks(knexInstance)
+		.then((bookmarks) => res.json(bookmarks))
+		//Using next, the error is caught by the error handling middleware
+		.catch(next);
 	})
 	.post(bodyParser, (req, res) => {
-		const bookmark = {
-			id          : uuid(),
-			title       : '',
-			url         : '',
-			description : '',
-			rating      : ''
-		};
-
-		const { title, url, description, rating } = req.body;
-		bookmark.title = title;
-		bookmark.url = url;
-		bookmark.description = description;
-		bookmark.rating = rating;
-		store.bookmarks.push(bookmark);
-		res.json(bookmark);
+		const date = new Date();
+		const {title,_url,_description,rating}= req.body;
+	
+	
+		res.json(title);
 	});
 
 bookmarkRouter
 	.route('/:id')
-	.get((req, res) => {
+	.get((req, res,next) => {
 		const id = req.path.split('/')[1];
 
-		const bookmark = store.bookmarks.find((bookmark) => bookmark.id === id);
-
-		if (bookmark) {
-			res.json(bookmark);
-		}
-		else {
-			res.status(404).send('Not found');
-			logger.error(`Sorry can't find ${id}`);
-			throw new Error(`Sorry can't find ${id}`);
-		}
+		const knexInstance = req.app.get('db');
+	services
+		.getBookMark(knexInstance,id)
+		.then((bookmarks) => res.json(bookmarks))
+		//Using next, the error is caught by the error handling middleware
+		.catch(next);
+	
 	})
 	.delete((req, res) => {
 		const id = req.path.split('/')[1];
